@@ -3,10 +3,12 @@
 namespace App\Exceptions;
 
 use Exception;
+use \Symfony\Component\HttpFoundation\Response;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
 {
+    
     /**
      * A list of the exception types that are not reported.
      *
@@ -48,6 +50,21 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if($request->expectsJson()){
+            if($exception instanceof NotFoundHttpException){
+                return response()->json([
+                    'errors' => 'Route error'
+                ],Response::HTTP_NOT_FOUND);
+            }
+        }
+
+        if($request->expectsJson()){
+            if($exception instanceof ModelNotFoundHttpException){
+                return response()->json([
+                    'errors' => 'Product Model Not Found'
+                ],Response::HTTP_NOT_FOUND);
+            }
+        }
         return parent::render($request, $exception);
     }
 }
